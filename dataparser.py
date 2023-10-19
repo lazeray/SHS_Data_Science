@@ -1,6 +1,8 @@
 import requests
 import json
 import sys
+import matplotlib.pyplot as plt 
+
 def download_webpage_as_html(url):
     try:
         # Send a GET request to the URL
@@ -33,6 +35,17 @@ def time_adjuster(data_array):
     
     return data_array
 
+def graph(data_array):
+    counter = 0
+    for sprint in data_array:
+        plt.scatter('x','y', data=sprint, color='black',s=5)
+        counter = counter + 1
+    
+    print(f"laze has played {counter} games of tetris")
+    ##plt.plot('x', 'y', data=data_array)
+    ##plt.plot('x', 'y', data=data_array[1], color='black')
+    plt.show()
+
 
 if __name__ == "__main__":
     name = input("Enter jstris username: ") # gets jstris username
@@ -40,12 +53,14 @@ if __name__ == "__main__":
     contents = download_webpage_as_html(url)
     input_data = json_getter(contents)
 
+  
+
     data_array = json.loads(input_data)
 
     data_array = time_adjuster(data_array)
 
-    print(data_array)
+    ##print(data_array)
 
-    
+    graph(data_array)
 
 
