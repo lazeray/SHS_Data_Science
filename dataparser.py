@@ -2,6 +2,8 @@ import requests
 import json
 import sys
 import matplotlib.pyplot as plt 
+import statistics
+import math
 
 def download_webpage_as_html(url):
     try:
@@ -35,23 +37,37 @@ def time_adjuster(data_array):
     
     return data_array
 
-def graph(data_array):
-    counter = 0
-    for sprint in data_array:
-        plt.scatter('x','y', data=sprint, color='black',s=5)
-        counter = counter + 1
+def graph(data_array, color):
     
-    print(f"laze has played {counter} games of tetris")
-    ##plt.plot('x', 'y', data=data_array)
-    ##plt.plot('x', 'y', data=data_array[1], color='black')
-    plt.show()
+    x_values = [sprint['x'] for sprint in data_array]
+    y_values = [sprint['y'] for sprint in data_array]
 
+
+    plt.plot(x_values, y_values, color)
+
+    ##print(f"{name} has played {len(data_array)} games of tetris")
+
+def medianBin(data_array, binsize):
+    binned_array = []
+    index = 0
+    for x in range(0,math.floor(len(data_array)/binsize)): ## that's the number of bins total
+        temp_array = []
+        index = x * binsize
+        for i in range(index,binsize+index):
+            temp_array.append(data_array[i]) 
+        binned_array.append(temp_array[median(temp_array)])
+    return binned_array
+
+def median(arr): ## finds the median, then returns the index in the given array
+    values = [item['y'] for item in arr]
+    median = statistics.median(values)
+    return values.index(median)
 
 if __name__ == "__main__":
     name = input("Enter jstris username: ") # gets jstris username
     url = "https://jstris.jezevec10.com/u/"+ name + "/stats"  # jstris data url
-    contents = download_webpage_as_html(url)
-    input_data = json_getter(contents)
+    contents = download_webpage_as_html(url) # self explanator
+    input_data = json_getter(contents) # gets the data from html
 
   
 
@@ -59,8 +75,10 @@ if __name__ == "__main__":
 
     data_array = time_adjuster(data_array)
 
+    data_array = sorted(data_array, key=lambda k: k['x'], reverse=False) # sorts tetris times chronologically
+
     ##print(data_array)
-
-    graph(data_array)
-
-
+    ##print(medianBin(data_array, 3))
+    ##graph(data_array, "black")
+    graph(medianBin(data_array, 3), "red")
+    plt.show()
